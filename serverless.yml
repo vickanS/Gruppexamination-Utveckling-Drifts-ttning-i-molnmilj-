@@ -25,7 +25,7 @@ functions:
     handler: createHotelRooms.handler
     events:
       - httpApi:
-          path: /
+          path: /createRooms
           method: put
   getRooms:
     handler: function/getRooms/index.handler
@@ -45,5 +45,17 @@ resources:
             AttributeType: S
         KeySchema:
           - AttributeName: roomId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    BonzaiBooking:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Bonzai-booking
+        AttributeDefinitions:
+          - AttributeName: bookingId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: bookingId
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST
