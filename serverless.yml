@@ -1,0 +1,31 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: skolprojekt
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: gruppexamination-utveckling-drift-moln
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: eu-north-1
+
+functions:
+  getRooms:
+    handler: function/getRooms/index.handler
+    events:
+      - httpApi:
+          path: /rooms
+          method: get
+
+resources:
+  Resources:
+    BonzaiRooms:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: Bonzai-rooms
+        AttributeDefinitions:
+          - AttributeName: roomId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: roomId
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
