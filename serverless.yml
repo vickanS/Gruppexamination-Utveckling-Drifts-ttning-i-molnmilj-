@@ -7,8 +7,26 @@ provider:
   name: aws
   runtime: nodejs20.x
   region: eu-north-1
+  iam:
+    role:
+      statements:
+        - Effect: "Allow"
+          Action:
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource: "*"
 
 functions:
+  createHotelRooms:
+    handler: createHotelRooms.handler
+    events:
+      - httpApi:
+          path: /
+          method: put
   getRooms:
     handler: function/getRooms/index.handler
     events:
