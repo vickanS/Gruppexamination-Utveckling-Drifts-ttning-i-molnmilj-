@@ -159,7 +159,7 @@ async function createRooms() {
     };
 
     try {
-      //Try to upload the rooms, if fail, catch it.
+      // Try to upload rooms, catch errors if any.
       await db.put(params);
       console.log(`Successfully added ${room.roomId}`);
     } catch (error) {
