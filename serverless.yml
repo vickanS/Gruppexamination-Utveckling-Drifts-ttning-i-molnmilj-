@@ -40,6 +40,12 @@ functions:
       - httpApi:
           path: /booking
           method: post
+  deleteBooking:
+    handler: functions/deleteBooking/index.handler
+    events:
+      - httpApi:
+          path: /cancel/{id}
+          method: delete
 
 resources:
   Resources:
