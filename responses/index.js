@@ -1,10 +1,10 @@
-function sendResponse(data) {
+function sendResponse(message) {
   return {
-    statusCode: 200,
+    statusCode: 201,
     headers: {
       "Content-Type": "application/json",
     },
-    body: { data },
+    body: JSON.stringify({ message }),
   };
 }
 
@@ -14,7 +14,7 @@ function sendError(code, message) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: { message },
+    body: JSON.stringify({ message }),
   };
 }
 
