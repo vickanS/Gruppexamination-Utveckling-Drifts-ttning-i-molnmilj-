@@ -1,19 +1,14 @@
 const { db } = require("../../services/db.js");
 const { sendError, sendResponse } = require("../../responses/index.js");
 
+// Define room prices
 const ROOM_PRICES = {
   single: 500,
   double: 1000,
   suite: 1500,
 };
 
-function capitalizeName(name) {
-  return name
-    .split(" ")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
-}
-
+// Function to calculate the total amount based on room type and stay duration
 function calculateTotalAmount(roomType, checkIn, checkOut) {
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
@@ -24,18 +19,22 @@ function calculateTotalAmount(roomType, checkIn, checkOut) {
   return pricePerNight * nights;
 }
 
+// Function to update a booking
 async function updateBooking(bookingNumber, updateDetails) {
-  const { roomType, guests, checkIn, checkOut, fullName } = updateDetails;
+  const { roomType, guests, checkIn, checkOut } = updateDetails;
 
+  // Fetch existing booking from the database
   const existingBooking = await db.get({
     TableName: "Bonzai-booking",
     Key: { bookingNumber: bookingNumber },
   });
 
+  // Check if the booking exists
   if (!existingBooking.Item) {
     return { error: "Booking not found" };
   }
 
+  // Validate room type and guest count
   if (roomType === "single" && guests > 1) {
     return { error: "Single room cannot have more than 1 guest" };
   }
@@ -46,6 +45,7 @@ async function updateBooking(bookingNumber, updateDetails) {
     return { error: "Suite cannot have more than 3 guests" };
   }
 
+  // Prepare update expression and attribute values for DynamoDB
   const updateExpression = [];
   const expressionAttributeValues = {};
 
@@ -65,11 +65,8 @@ async function updateBooking(bookingNumber, updateDetails) {
     updateExpression.push("checkOut = :checkOut");
     expressionAttributeValues[":checkOut"] = checkOut;
   }
-  if (fullName) {
-    updateExpression.push("fullName = :fullName");
-    expressionAttributeValues[":fullName"] = capitalizeName(fullName);
-  }
 
+  // Recalculate total amount if check-in or check-out dates are updated
   if (checkIn || checkOut) {
     const newRoomType = roomType || existingBooking.Item.roomType;
     const newCheckIn = checkIn || existingBooking.Item.checkIn;
@@ -79,10 +76,12 @@ async function updateBooking(bookingNumber, updateDetails) {
     expressionAttributeValues[":totalAmount"] = totalAmount;
   }
 
+  // Return error if no fields are provided for update
   if (updateExpression.length === 0) {
     return { error: "No fields to update" };
   }
 
+  // Update the booking in the database
   await db.update({
     TableName: "Bonzai-booking",
     Key: { bookingNumber: bookingNumber },
@@ -90,11 +89,13 @@ async function updateBooking(bookingNumber, updateDetails) {
     ExpressionAttributeValues: expressionAttributeValues,
   });
 
+  // Fetch the updated booking details
   const updatedBooking = await db.get({
     TableName: "Bonzai-booking",
     Key: { bookingNumber: bookingNumber },
   });
 
+  // Return the updated booking details
   return {
     message: "Booking updated successfully",
     fullName: updatedBooking.Item.fullName,
@@ -107,6 +108,7 @@ async function updateBooking(bookingNumber, updateDetails) {
   };
 }
 
+// Lambda function handler
 exports.handler = async (event) => {
   console.log("Event received:", event.body);
 
@@ -123,6 +125,7 @@ exports.handler = async (event) => {
       return sendError(400, updateResult.error);
     }
 
+    // Send success response with updated booking details
     return sendResponse(updateResult);
   } catch (error) {
     console.error("Error updating booking: ", error);
