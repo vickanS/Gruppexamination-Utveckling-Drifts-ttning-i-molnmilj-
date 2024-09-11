@@ -66,9 +66,9 @@ resources:
       Properties:
         TableName: Bonzai-booking
         AttributeDefinitions:
-          - AttributeName: bookingId
+          - AttributeName: bookingNumber
             AttributeType: S
         KeySchema:
-          - AttributeName: bookingId
+          - AttributeName: bookingNumber
             KeyType: HASH
         BillingMode: PAY_PER_REQUEST

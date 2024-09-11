@@ -2,21 +2,21 @@ const { db } = require("../../services/db");
 const { sendResponse, sendError } = require("../../responses/index");
 
 // Remove the reservation from database
-async function deleteReservation(bookingId) {
+async function deleteReservation(bookingNumber) {
   await db.delete({
     TableName: "Bonzai-booking",
     Key: {
-      bookingId: bookingId,
+      bookingNumber: bookingNumber,
     },
   });
 }
 
 // Get the reservation
-async function getReservation(bookingId) {
+async function getReservation(bookingNumber) {
   const { Item } = await db.get({
     TableName: "Bonzai-booking",
     Key: {
-      bookingId: bookingId,
+      bookingNumber,
     },
   });
 
@@ -24,25 +24,20 @@ async function getReservation(bookingId) {
 }
 
 exports.handler = async (event) => {
-  // Get bookingId from path
-  const bookingId = event.pathParameters.id;
+  // Get bookingNumber from path
+  const bookingNumber = event.pathParameters.id;
 
-  const reservationInfo = await getReservation(bookingId);
+  let reservationInfo = await getReservation(bookingNumber);
 
   // See if reservation exists.
   if (!reservationInfo) {
-    return sendError(400, {
-      message: "Can't find the reservation",
-    });
+    return sendError(500, "Can't find the reservation");
   }
   // Delete reservation or return error
   try {
-    await deleteReservation(bookingId);
-    return sendResponse(200, { message: "Reservation is removed" });
+    await deleteReservation(bookingNumber);
+    return sendResponse("Reservation is removed");
   } catch (error) {
-    return sendError(404, {
-      message: "Can't delete reservation",
-      error: error.toString(),
-    });
+    return sendError(404, "Can't delete reservation");
   }
 };

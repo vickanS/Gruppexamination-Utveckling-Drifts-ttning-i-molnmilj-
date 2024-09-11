@@ -43,7 +43,7 @@ async function createBooking(body) {
   // Uniqe ID
   const id = uuidv4();
   const bookingId = uuidv4();
-  const bookingNumber = generateBookingNumber();
+  const bookingNumber = generateBookingNumber().toString();
 
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
@@ -88,10 +88,10 @@ exports.handler = async (event) => {
     const { roomType, guests, checkIn, checkOut, fullName, email } = body;
 
     if (!roomType || !guests || !checkIn || !checkOut || !fullName || !email) {
-      return sendError(400, {
-        message:
-          "Missing required fields: roomType, guests, checkIn, checkOut, fullName, and/or email",
-      });
+      return sendError(
+        400,
+        "Missing required fields: roomType, guests, checkIn, checkOut, fullName, and/or email"
+      );
     }
     // Validate the number of guests based on room type
 
@@ -105,6 +105,7 @@ exports.handler = async (event) => {
       return sendError(400, "Suite cannot have more than 3 guests");
     }
 
+    // Create the booking and return success
     const booking = await createBooking(body);
     return sendResponse({
       message: "Booking created successfully",
@@ -116,9 +117,6 @@ exports.handler = async (event) => {
       checkOut: booking.checkOut,
       totalAmount: booking.totalAmount,
     });
-    // Create the booking and return success
-    await createBooking(body);
-    return sendResponse({ message: "Booking created successfully" });
   } catch (error) {
     // Log and return error if something goes wrong
     console.error("Error creating booking: ", error);
