@@ -32,12 +32,12 @@ Execute the URL with the path /booking using the POST method.
 Here's an example of a JSON object to use in the request body:
 ```
 {
-  "roomType": "single",
-  "guests": 1,
-  "checkIn": "2024-09-10",
-  "checkOut": "2024-09-14",
   "fullName": "Test Testsson",
-  "email": "test.testsson@example.com"
+  "email": "test.testsson@example.com",
+  "guests": 1,
+  "roomType": "single",
+  "checkIn": "2024-10-10",
+  "checkOut": "2024-10-13"
 }
 ```
 You can choose from different room types: Single, Double, or Suite.
@@ -54,12 +54,11 @@ Use the URL with the path /updateBooking and the PUT method.
 Modify the JSON object to update specific details of the reservation. Here's an example:
 ```
 {
-  "roomType": "single",
-  "guests": 1,
-  "checkIn": "2024-09-10",
-  "checkOut": "2024-09-14",
-  "fullName": "Test Testsson",
-  "email": "test.testsson@example.com"
+  "bookingNumber": "XXXXXXXXXX",
+  "guests": 2,
+  "roomType": "double",
+  "checkIn": "2024-10-10",
+  "checkOut": "2024-10-15"
 }
 ```
 

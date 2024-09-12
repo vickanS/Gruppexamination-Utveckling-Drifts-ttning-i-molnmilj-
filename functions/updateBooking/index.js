@@ -1,7 +1,7 @@
 const { db } = require("../../services/db.js");
 const { sendError, sendResponse } = require("../../responses/index.js");
 
-// Define room prices
+// Room prices
 const ROOM_PRICES = {
   single: 500,
   double: 1000,
@@ -12,9 +12,7 @@ const ROOM_PRICES = {
 function calculateTotalAmount(roomType, checkIn, checkOut) {
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
-  const nights = Math.ceil(
-    (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)
-  );
+  const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
   const pricePerNight = ROOM_PRICES[roomType];
   return pricePerNight * nights;
 }

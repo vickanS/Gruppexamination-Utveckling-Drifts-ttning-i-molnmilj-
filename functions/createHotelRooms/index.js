@@ -1,7 +1,7 @@
 const { db } = require("../../services/db.js");
 
-// 20 hotelrooms
-const hotelrooms = [
+// 20 hotel rooms
+const hotelRooms = [
   {
     roomId: "room-1",
     roomType: "Single",
@@ -144,9 +144,9 @@ const hotelrooms = [
   },
 ];
 
-// Creates hotelrooms and upload to DynamoDB
+// Creates hotel rooms and upload to DynamoDB
 async function createRooms() {
-  for (const room of hotelrooms) {
+  for (const room of hotelRooms) {
     const params = {
       TableName: "Bonzai-rooms",
       Item: {

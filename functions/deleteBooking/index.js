@@ -28,7 +28,7 @@ exports.handler = async (event) => {
   const bookingNumber = event.pathParameters.id;
 
   let reservationInfo = await getReservation(bookingNumber);
-
+  
   // See if reservation exists.
   if (!reservationInfo) {
     return sendError(500, "Can't find the reservation");

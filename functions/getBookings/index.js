@@ -1,4 +1,3 @@
-// Som receptionist vill jag kunna se alla bokningar som gjorts för att få en överblick över hur beläggningen av hotellet ser ut.
 const { db } = require("../../services/db.js");
 const { sendError, sendResponse } = require("../../responses/index.js");
 
@@ -28,4 +27,3 @@ exports.handler = async (event) => {
     });
   }
 };
-

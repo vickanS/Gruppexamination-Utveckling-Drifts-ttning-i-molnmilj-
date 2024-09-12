@@ -32,13 +32,14 @@ function bodyToLowerCase(obj) {
   return obj;
 }
 
+// Room prices
 const ROOM_PRICES = {
   Single: 500,
   Double: 1000,
   Suite: 1500,
 };
 
-// Generates a random number
+// Generates a random booking number
 function generateBookingNumber() {
   const min = 1000000000;
   const max = 9999999999;
@@ -85,16 +86,13 @@ async function createBooking(body) {
   const { roomType, guests, checkIn, checkOut, fullName, email } = body;
 
   // Uniqe ID
-  const id = uuidv4();
   const bookingId = uuidv4();
   const bookingNumber = generateBookingNumber().toString();
 
   // Calculate the total price
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
-  const nights = Math.ceil(
-    (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)
-  );
+  const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
   const pricePerNight = ROOM_PRICES[roomType];
   const totalAmount = pricePerNight * nights;
 
