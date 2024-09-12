@@ -42,6 +42,33 @@ Here's an example of a JSON object to use in the request body:
 ```
 You can choose from different room types: Single, Double, or Suite.
 
+You can book multiple rooms at once by using an array of objects.
+Here's an example: 
+```
+[{
+  "roomType": "double",
+  "guests": 2,
+  "checkIn": "2024-09-10",
+  "checkOut": "2024-09-14",
+  "fullName": "Test Testsson",
+  "email": "test.testsson@example.com"
+},{
+  "roomType": "single",
+  "guests": 1,
+  "checkIn": "2024-09-10",
+  "checkOut": "2024-09-14",
+  "fullName": "Test Testsson",
+  "email": "test.testsson@example.com"
+},{
+  "roomType": "Suite",
+  "guests": 3,
+  "checkIn": "2024-09-10",
+  "checkOut": "2024-09-14",
+  "fullName": "Test Testsson",
+  "email": "test.testsson@example.com"
+}]
+```
+
 ### Cancel a reservation:
 Execute the URL with the path /cancel/{id} using the DELETE method.
 Replace {id} with the booking number you received during the reservation process, for example: "bookingNumber": "8710805234"
