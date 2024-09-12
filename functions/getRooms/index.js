@@ -1,6 +1,7 @@
 const { db } = require("../../services/db.js");
 const { sendError, sendResponse } = require("../../responses/index.js");
 
+// fetch all the rooms from database
 async function getRooms() {
   const { Items } = await db.scan({
     TableName: "Bonzai-rooms",
@@ -9,6 +10,7 @@ async function getRooms() {
   return Items;
 }
 
+// Return rooms in a response or handle error
 exports.handler = async (event) => {
   try {
     const allRooms = await getRooms();
