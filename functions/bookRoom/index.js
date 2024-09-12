@@ -130,66 +130,90 @@ async function createBooking(body, roomId) {
   return booking;
 }
 
+// Processes a reservation request by validating input data, checking room availability, and booking a room if all criteria are met.
+async function procesReservation(reservation) {
+  // Converts all string fields to lowercase.
+  reservation = bodyToLowerCase(reservation);
+  reservation.roomType = capitalizeRoomType(reservation.roomType);
+
+  // Check if all required fields are provided
+  const { roomType, guests, checkIn, checkOut, fullName, email } = reservation;
+
+  if (!roomType || !guests || !checkIn || !checkOut || !fullName || !email) {
+    return sendError(
+      400,
+      "Missing required fields: roomType, guests, checkIn, checkOut, fullName, and/or email"
+    );
+  }
+
+  // Validate the number of guests based on room type
+  if (roomType === "Single" && guests > 1) {
+    return sendError(400, "Single room cannot have more than 1 guest");
+  }
+  if (roomType === "Double" && guests > 2) {
+    return sendError(400, "Double room cannot have more than 2 guests");
+  }
+  if (roomType === "Suite" && guests > 3) {
+    return sendError(400, "Suite cannot have more than 3 guests");
+  }
+
+  // Run the roomsAvailable function and see if there is any rooms available
+  const availableRoom = await roomsAvailable(roomType);
+  if (!availableRoom.Items || availableRoom.Items.length === 0) {
+    return sendError(400, "Sorry, no " + roomType + " rooms available.");
+  }
+
+  const roomToBook = await getFirstAvailableRoom(roomType);
+
+  // Check if `roomToBook` and `roomId` exist
+  if (!roomToBook || !roomToBook.roomId) {
+    return sendError(500, "Failed to find a valid room to book.");
+  }
+
+  const roomId = roomToBook.roomId;
+
+  // Update status to false
+  await updateRoomStatus(roomId, false);
+
+  // Create the booking and return success
+  const booking = await createBooking(reservation, roomId);
+  return booking;
+}
+
 exports.handler = async (event) => {
   // Try to create a new item, handling error as needed
   try {
     let body = JSON.parse(event.body);
 
-    // Converts all string fields to lowercase.
-    body = bodyToLowerCase(body);
-    body.roomType = capitalizeRoomType(body.roomType);
+    if (Array.isArray(body)) {
+      const bookings = [];
+      for (let reservation of body) {
+        const booking = await procesReservation(reservation);
+        bookings.push(booking);
+      }
 
-    // Check if all required fields are provided
-    const { roomType, guests, checkIn, checkOut, fullName, email } = body;
-
-    if (!roomType || !guests || !checkIn || !checkOut || !fullName || !email) {
+      return sendResponse({
+        message: "Booking created successfully",
+        bookings: bookings,
+      });
+    } else if (typeof body === "object" && body !== null) {
+      const booking = await procesReservation(body);
+      return sendResponse({
+        message: "Booking created successfully",
+        fullName: booking.fullName,
+        bookingNumber: booking.bookingNumber,
+        guests: booking.guests,
+        roomType: booking.roomType,
+        checkIn: booking.checkIn,
+        checkOut: booking.checkOut,
+        totalAmount: booking.totalAmount,
+      });
+    } else {
       return sendError(
         400,
-        "Missing required fields: roomType, guests, checkIn, checkOut, fullName, and/or email"
+        "Request body must be an object or an array of objects"
       );
     }
-
-    // Validate the number of guests based on room type
-    if (roomType === "Single" && guests > 1) {
-      return sendError(400, "Single room cannot have more than 1 guest");
-    }
-    if (roomType === "Double" && guests > 2) {
-      return sendError(400, "Double room cannot have more than 2 guests");
-    }
-    if (roomType === "Suite" && guests > 3) {
-      return sendError(400, "Suite cannot have more than 3 guests");
-    }
-
-    // Run the roomsAvailable function and see if there is any rooms available
-    const availableRoom = await roomsAvailable(roomType);
-    if (!availableRoom.Items || availableRoom.Items.length === 0) {
-      return sendError(400, "Sorry, no " + roomType + " rooms available.");
-    }
-
-    const roomToBook = await getFirstAvailableRoom(roomType);
-
-    // Check if `roomToBook` and `roomId` exist
-    if (!roomToBook || !roomToBook.roomId) {
-      return sendError(500, "Failed to find a valid room to book.");
-    }
-
-    const roomId = roomToBook.roomId;
-
-    // Update status to false
-    await updateRoomStatus(roomId, false);
-
-    // Create the booking and return success
-    const booking = await createBooking(body, roomId);
-    return sendResponse({
-      message: "Booking created successfully",
-      fullName: booking.fullName,
-      bookingNumber: booking.bookingNumber,
-      guests: booking.guests,
-      roomType: booking.roomType,
-      checkIn: booking.checkIn,
-      checkOut: booking.checkOut,
-      totalAmount: booking.totalAmount,
-    });
   } catch (error) {
     // Log and return error if something goes wrong
     console.error("Error creating booking: ", error);
