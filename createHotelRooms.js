@@ -161,8 +161,8 @@ async function createRooms() {
     try {
       // Try to upload rooms, catch errors if any.
       await db.put(params);
-      console.log(`Successfully added ${room.roomId}`);
     } catch (error) {
+      // See CloudWatch for log
       console.error(`Failed to add ${room.roomId}:`, error);
     }
   }
