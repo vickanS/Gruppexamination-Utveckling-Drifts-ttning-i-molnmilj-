@@ -1,4 +1,4 @@
-const { db } = require("services/db.js");
+const { db } = require("../../services/db.js");
 
 // 20 hotelrooms
 const hotelrooms = [

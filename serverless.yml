@@ -21,9 +21,16 @@ provider:
             - dynamodb:DeleteItem
           Resource: "*"
 
+build:
+  esbuild:
+    minify: true
+
+package:
+  individually: true
+
 functions:
   createHotelRooms:
-    handler: createHotelRooms.handler
+    handler: functions/createHotelRooms/index.handler
     events:
       - httpApi:
           path: /createRooms

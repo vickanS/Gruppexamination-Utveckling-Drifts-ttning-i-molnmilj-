@@ -138,13 +138,13 @@ exports.handler = async (event) => {
     }
 
     // Validate the number of guests based on room type
-    if (roomType === "single" && guests > 1) {
+    if (roomType === "Single" && guests > 1) {
       return sendError(400, "Single room cannot have more than 1 guest");
     }
-    if (roomType === "double" && guests > 2) {
+    if (roomType === "Double" && guests > 2) {
       return sendError(400, "Double room cannot have more than 2 guests");
     }
-    if (roomType === "suite" && guests > 3) {
+    if (roomType === "Suite" && guests > 3) {
       return sendError(400, "Suite cannot have more than 3 guests");
     }
 
