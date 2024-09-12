@@ -64,6 +64,17 @@ async function roomsAvailable(roomType) {
   return { Items: filteredRooms };
 }
 
+// Get the first available room
+async function getFirstAvailableRoom(roomType) {
+  const availableRoom = await roomsAvailable(roomType);
+
+  if (!availableRoom.Items || availableRoom.Items.length === 0) {
+    throw new Error("No rooms available");
+  }
+
+  return availableRoom.Items[0];
+}
+
 // Update availability
 async function updateRoomStatus(roomId, availableStatus) {
   const params = {
@@ -81,7 +92,7 @@ async function updateRoomStatus(roomId, availableStatus) {
 }
 
 // A function that creates a new booking item with a generated ID and input from the body.
-async function createBooking(body) {
+async function createBooking(body, roomId) {
   // Input from body
   const { roomType, guests, checkIn, checkOut, fullName, email } = body;
 
@@ -92,7 +103,9 @@ async function createBooking(body) {
   // Calculate the total price
   const checkInDate = new Date(checkIn);
   const checkOutDate = new Date(checkOut);
-  const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+  const nights = Math.ceil(
+    (checkOutDate - checkInDate) / (1000 * 60 * 60 * 24)
+  );
   const pricePerNight = ROOM_PRICES[roomType];
   const totalAmount = pricePerNight * nights;
 
@@ -106,6 +119,7 @@ async function createBooking(body) {
     fullName: capitalizeName(fullName),
     email: email,
     totalAmount: totalAmount,
+    roomId: roomId,
   };
 
   await db.put({
@@ -152,8 +166,7 @@ exports.handler = async (event) => {
       return sendError(400, "Sorry, no " + roomType + " rooms available.");
     }
 
-    // Take the first available room and take its roomId
-    const roomToBook = availableRoom.Items[0];
+    const roomToBook = await getFirstAvailableRoom(roomType);
 
     // Check if `roomToBook` and `roomId` exist
     if (!roomToBook || !roomToBook.roomId) {
@@ -166,7 +179,7 @@ exports.handler = async (event) => {
     await updateRoomStatus(roomId, false);
 
     // Create the booking and return success
-    const booking = await createBooking(body);
+    const booking = await createBooking(body, roomId);
     return sendResponse({
       message: "Booking created successfully",
       fullName: booking.fullName,

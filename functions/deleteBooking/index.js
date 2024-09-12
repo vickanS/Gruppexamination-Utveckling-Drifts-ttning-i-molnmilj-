@@ -11,6 +11,21 @@ async function deleteReservation(bookingNumber) {
   });
 }
 
+// Update availability
+async function updateRoomStatus(roomId, availableStatus) {
+  const params = {
+    TableName: "Bonzai-rooms",
+    Key: { roomId: roomId },
+    UpdateExpression: "set available = :available",
+    ExpressionAttributeValues: {
+      ":available": availableStatus,
+    },
+    ReturnValues: "ALL_NEW",
+  };
+
+  const updateRoom = db.update(params);
+  return updateRoom.Attributes;
+}
 // Get the reservation
 async function getReservation(bookingNumber) {
   const { Item } = await db.get({
@@ -28,13 +43,20 @@ exports.handler = async (event) => {
   const bookingNumber = event.pathParameters.id;
 
   let reservationInfo = await getReservation(bookingNumber);
-  
+
   // See if reservation exists.
   if (!reservationInfo) {
     return sendError(500, "Can't find the reservation");
   }
-  // Delete reservation or return error
+
+  // Find room id
+  const roomId = reservationInfo.roomId;
+
   try {
+    // Update status to false
+    await updateRoomStatus(roomId, true);
+
+    // Delete reservation
     await deleteReservation(bookingNumber);
     return sendResponse("Reservation is removed");
   } catch (error) {
