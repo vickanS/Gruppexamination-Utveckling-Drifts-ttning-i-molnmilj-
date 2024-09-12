@@ -1,69 +1,66 @@
-<!--
-title: 'AWS Simple HTTP Endpoint example in NodeJS'
-description: 'This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.'
-layout: Doc
-framework: v4
-platform: AWS
-language: nodeJS
-authorLink: 'https://github.com/serverless'
-authorName: 'Serverless, Inc.'
-authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
--->
+# Group Examination: Bonz.ai
+### Created by Eric, Winnie, and Victoria
 
-# Serverless Framework Node HTTP API on AWS
+## Steps to run the project:
+1. Clone the Git repository:
+- Open your terminal/console and run the following command: git clone <repo-url>
 
-This template demonstrates how to make a simple HTTP API with Node.js running on AWS Lambda and API Gateway using the Serverless Framework.
+2. Navigate to the project directory:
+- Run the command: cd <directory-name>
 
-This template does not include any kind of persistence (database). For more advanced examples, check out the [serverless/examples repository](https://github.com/serverless/examples/) which includes Typescript, Mongo, DynamoDB and other examples.
+3. Install dependencies:
+ Use the command: npm install
+This will install all the required dependencies.
 
-## Usage
+4. Deploy the code to AWS:
+- Run the following command to deploy the project: serverless deploy
 
-### Deployment
+This will create several Lambda functions and two databases in your AWS account.
 
-In order to deploy the example, you need to run the following command:
+## Retrieve URLs:
+Once deployed, you’ll see some URLs in your terminal/console.
+Use these in a tool like Insomnia or any other program that can execute API requests.
 
+### How to use the API:
+Create hotel rooms in the database:
+Execute the URL with the path /createRooms using the PUT method.
+This will add 20 hotel rooms to the database.
+
+### Make a reservation:
+Execute the URL with the path /booking using the POST method.
+Here's an example of a JSON object to use in the request body:
 ```
-serverless deploy
+{
+  "roomType": "single",
+  "guests": 1,
+  "checkIn": "2024-09-10",
+  "checkOut": "2024-09-14",
+  "fullName": "Test Testsson",
+  "email": "test.testsson@example.com"
+}
+```
+You can choose from different room types: Single, Double, or Suite.
+
+### Cancel a reservation:
+Execute the URL with the path /cancel/{id} using the DELETE method.
+Replace {id} with the booking number you received during the reservation process, for example: "bookingNumber": "8710805234"
+
+### View reservations as a receptionist:
+Use the URL with the path /bookings and the GET method to retrieve all current reservations.
+
+### Update a booking:
+Use the URL with the path /updateBooking and the PUT method.
+Modify the JSON object to update specific details of the reservation. Here's an example:
+```
+{
+  "roomType": "single",
+  "guests": 1,
+  "checkIn": "2024-09-10",
+  "checkOut": "2024-09-14",
+  "fullName": "Test Testsson",
+  "email": "test.testsson@example.com"
+}
 ```
 
-After running deploy, you should see output similar to:
-
-```
-Deploying "serverless-http-api" to stage "dev" (us-east-1)
-
-✔ Service deployed to stack serverless-http-api-dev (91s)
-
-endpoint: GET - https://xxxxxxxxxx.execute-api.us-east-1.amazonaws.com/
-functions:
-  hello: serverless-http-api-dev-hello (1.6 kB)
-```
-
-_Note_: In current form, after deployment, your API is public and can be invoked by anyone. For production deployments, you might want to configure an authorizer. For details on how to do that, refer to [HTTP API (API Gateway V2) event docs](https://www.serverless.com/framework/docs/providers/aws/events/http-api).
-
-### Invocation
-
-After successful deployment, you can call the created application via HTTP:
-
-```
-curl https://xxxxxxx.execute-api.us-east-1.amazonaws.com/
-```
-
-Which should result in response similar to:
-
-```json
-{ "message": "Go Serverless v4! Your function executed successfully!" }
-```
-
-### Local development
-
-The easiest way to develop and test your function is to use the `dev` command:
-
-```
-serverless dev
-```
-
-This will start a local emulator of AWS Lambda and tunnel your requests to and from AWS Lambda, allowing you to interact with your function as if it were running in the cloud.
-
-Now you can invoke the function as before, but this time the function will be executed locally. Now you can develop your function locally, invoke it, and see the results immediately without having to re-deploy.
-
-When you are done developing, don't forget to run `serverless deploy` to deploy the function to the cloud.
+### View all rooms and their status:
+Use the URL with the path /rooms and the GET method to check the status of each room.
