@@ -9,7 +9,8 @@
 - Run the command: cd <directory-name>
 
 3. Install dependencies:
- Use the command: npm install
+- Use the command: npm install
+  
 This will install all the required dependencies.
 
 4. Deploy the code to AWS:
